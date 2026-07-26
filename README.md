@@ -30,9 +30,9 @@ start with Wodby CI build configuration:
 
 | Component / service | Default configuration |
 | --- | --- |
-| Python (`django`)<br>`django` | required; enabled by default; main service; links: `db` → `postgres`, `redis` → `valkey`, `sendmail` → `mailpit` |
+| Python (`django`)<br>`django` | required; enabled by default; main service; Celery worker derivative; links: `db` → `postgres`, `redis` → `valkey`, `sendmail` → `mailpit` |
 | PostgreSQL (`postgres`)<br>`postgres` | required; enabled by default; volumes: `data` 20 GB |
-| Valkey<br>`valkey` | optional; disabled by default |
+| Valkey<br>`valkey` | required; enabled by default; persistent 5 GB volume; queue-safe `noeviction` policy |
 | Mailpit<br>`mailpit` | optional; disabled by default |
 | OpenSMTPD<br>`opensmtpd` | optional; disabled by default |
 | Gotenberg<br>`gotenberg` | optional; disabled by default |
@@ -41,6 +41,17 @@ start with Wodby CI build configuration:
 Enabled optional services are selected by default but can be excluded when an
 app is created. Disabled optional services are available but not selected by
 default. Required services cannot be excluded.
+
+## Background jobs
+
+The Django service includes a Celery worker derivative, and the boilerplate
+configures it through `CELERY_BROKER_URL`. Valkey is required because it stores
+queued and unacknowledged work; persistence and `noeviction` prevent broker
+messages from being treated as disposable cache entries.
+
+The boilerplate deliberately does not use this Valkey instance for Django's
+cache. Add a separate optional cache service with an LRU policy when an
+application needs caching so cache pressure cannot block broker writes.
 
 ## Deploy this stack
 

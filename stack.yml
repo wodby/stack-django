@@ -8,6 +8,9 @@ services:
   service: django
   required: true
   main: true
+  derivatives:
+  - name: celery
+    service: django-celery
   links:
   - name: db
     service: postgres
@@ -27,7 +30,15 @@ services:
 - name: valkey
   title: Valkey
   service: valkey
-  disabled: true
+  required: true
+  env:
+  - name: VALKEY_SAVE_TO_DISK
+    value: '1'
+  - name: VALKEY_MAXMEMORY_POLICY
+    value: noeviction
+  volumes:
+  - name: data
+    size: 5
 
 - name: mailpit
   disabled: true
