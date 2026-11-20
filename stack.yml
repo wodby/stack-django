@@ -2,6 +2,7 @@ name: django
 icon: django
 docs: https://wodby.com/docs/2.0/stacks/catalog/django/
 title: Django
+category: frameworks
 
 services:
 - name: django
